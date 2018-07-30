@@ -16,7 +16,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-func podTemplateTestLoadRole(assert *assert.Assertions) *model.Role {
+func podTemplateTestLoadRole(assert *assert.Assertions) *model.InstanceGroup {
 	workDir, err := os.Getwd()
 	if !assert.NoError(err) {
 		return nil
@@ -396,8 +396,8 @@ func TestPodGetEnvVarsFromConfigSizingCountKube(t *testing.T) {
 		},
 	}, ExportSettings{
 		RoleManifest: &model.RoleManifest{
-			Roles: []*model.Role{
-				&model.Role{
+			InstanceGroups: []*model.InstanceGroup{
+				&model.InstanceGroup{
 					Name: "foo",
 					Run: &model.RoleRun{
 						Scaling: &model.RoleRunScaling{
@@ -434,8 +434,8 @@ func TestPodGetEnvVarsFromConfigSizingCountHelm(t *testing.T) {
 	}, ExportSettings{
 		CreateHelmChart: true,
 		RoleManifest: &model.RoleManifest{
-			Roles: []*model.Role{
-				&model.Role{
+			InstanceGroups: []*model.InstanceGroup{
+				&model.InstanceGroup{
 					Name: "foo",
 				},
 			},
@@ -473,8 +473,8 @@ func TestPodGetEnvVarsFromConfigSizingPortsKube(t *testing.T) {
 		},
 	}, ExportSettings{
 		RoleManifest: &model.RoleManifest{
-			Roles: []*model.Role{
-				&model.Role{
+			InstanceGroups: []*model.InstanceGroup{
+				&model.InstanceGroup{
 					Name: "foo",
 					Run: &model.RoleRun{
 						ExposedPorts: []*model.RoleRunExposedPort{
@@ -521,8 +521,8 @@ func TestPodGetEnvVarsFromConfigSizingPortsHelm(t *testing.T) {
 	}, ExportSettings{
 		CreateHelmChart: true,
 		RoleManifest: &model.RoleManifest{
-			Roles: []*model.Role{
-				&model.Role{
+			InstanceGroups: []*model.InstanceGroup{
+				&model.InstanceGroup{
 					Name: "foo",
 					Run: &model.RoleRun{
 						ExposedPorts: []*model.RoleRunExposedPort{
@@ -568,8 +568,8 @@ func TestPodGetEnvVarsFromConfigGenerationCounterKube(t *testing.T) {
 		},
 	}, ExportSettings{
 		RoleManifest: &model.RoleManifest{
-			Roles: []*model.Role{
-				&model.Role{
+			InstanceGroups: []*model.InstanceGroup{
+				&model.InstanceGroup{
 					Name: "foo",
 				},
 			},
@@ -601,8 +601,8 @@ func TestPodGetEnvVarsFromConfigGenerationCounterHelm(t *testing.T) {
 	}, ExportSettings{
 		CreateHelmChart: true,
 		RoleManifest: &model.RoleManifest{
-			Roles: []*model.Role{
-				&model.Role{
+			InstanceGroups: []*model.InstanceGroup{
+				&model.InstanceGroup{
 					Name: "foo",
 				},
 			},
@@ -637,8 +637,8 @@ func TestPodGetEnvVarsFromConfigGenerationNameKube(t *testing.T) {
 		},
 	}, ExportSettings{
 		RoleManifest: &model.RoleManifest{
-			Roles: []*model.Role{
-				&model.Role{
+			InstanceGroups: []*model.InstanceGroup{
+				&model.InstanceGroup{
 					Name: "foo",
 				},
 			},
@@ -670,8 +670,8 @@ func TestPodGetEnvVarsFromConfigGenerationNameHelm(t *testing.T) {
 	}, ExportSettings{
 		CreateHelmChart: true,
 		RoleManifest: &model.RoleManifest{
-			Roles: []*model.Role{
-				&model.Role{
+			InstanceGroups: []*model.InstanceGroup{
+				&model.InstanceGroup{
 					Name: "foo",
 				},
 			},
@@ -707,8 +707,8 @@ func TestPodGetEnvVarsFromConfigSecretsKube(t *testing.T) {
 		},
 	}, ExportSettings{
 		RoleManifest: &model.RoleManifest{
-			Roles: []*model.Role{
-				&model.Role{
+			InstanceGroups: []*model.InstanceGroup{
+				&model.InstanceGroup{
 					Name: "foo",
 				},
 			},
@@ -739,8 +739,8 @@ func TestPodGetEnvVarsFromConfigSecretsHelm(t *testing.T) {
 	settings := ExportSettings{
 		CreateHelmChart: true,
 		RoleManifest: &model.RoleManifest{
-			Roles: []*model.Role{
-				&model.Role{
+			InstanceGroups: []*model.InstanceGroup{
+				&model.InstanceGroup{
 					Name: "foo",
 				},
 			},
@@ -878,8 +878,8 @@ func TestPodGetEnvVarsFromConfigNonSecretKube(t *testing.T) {
 
 	settings := ExportSettings{
 		RoleManifest: &model.RoleManifest{
-			Roles: []*model.Role{
-				&model.Role{
+			InstanceGroups: []*model.InstanceGroup{
+				&model.InstanceGroup{
 					Name: "foo",
 				},
 			},
@@ -943,8 +943,8 @@ func TestPodGetEnvVarsFromConfigNonSecretHelmUserOptional(t *testing.T) {
 	}, ExportSettings{
 		CreateHelmChart: true,
 		RoleManifest: &model.RoleManifest{
-			Roles: []*model.Role{
-				&model.Role{
+			InstanceGroups: []*model.InstanceGroup{
+				&model.InstanceGroup{
 					Name: "foo",
 				},
 			},
@@ -1009,8 +1009,8 @@ func TestPodGetEnvVarsFromConfigNonSecretHelmUserRequired(t *testing.T) {
 	}, ExportSettings{
 		CreateHelmChart: true,
 		RoleManifest: &model.RoleManifest{
-			Roles: []*model.Role{
-				&model.Role{
+			InstanceGroups: []*model.InstanceGroup{
+				&model.InstanceGroup{
 					Name: "foo",
 				},
 			},
@@ -1690,7 +1690,7 @@ func TestPodGetContainerReadinessProbe(t *testing.T) {
 	}
 }
 
-func podTestLoadRoleFrom(assert *assert.Assertions, roleName, manifestName string) *model.Role {
+func podTestLoadRoleFrom(assert *assert.Assertions, roleName, manifestName string) *model.InstanceGroup {
 	workDir, err := os.Getwd()
 	assert.NoError(err)
 
@@ -1714,7 +1714,7 @@ func podTestLoadRoleFrom(assert *assert.Assertions, roleName, manifestName strin
 	return role
 }
 
-func podTestLoadRole(assert *assert.Assertions, roleName string) *model.Role {
+func podTestLoadRole(assert *assert.Assertions, roleName string) *model.InstanceGroup {
 	return podTestLoadRoleFrom(assert, roleName, "pods.yml")
 }
 

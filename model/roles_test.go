@@ -29,15 +29,15 @@ func TestLoadRoleManifestOK(t *testing.T) {
 	require.NotNil(t, roleManifest)
 
 	assert.Equal(t, roleManifestPath, roleManifest.manifestFilePath)
-	assert.Len(t, roleManifest.Roles, 2)
+	assert.Len(t, roleManifest.InstanceGroups, 2)
 
-	myrole := roleManifest.Roles[0]
+	myrole := roleManifest.InstanceGroups[0]
 	assert.Equal(t, []string{
 		"myrole.sh",
 		"/script/with/absolute/path.sh",
 	}, myrole.Scripts)
 
-	foorole := roleManifest.Roles[1]
+	foorole := roleManifest.InstanceGroups[1]
 	torjob := foorole.RoleJobs[0]
 	assert.Equal(t, "tor", torjob.Name)
 	assert.NotNil(t, torjob.Release)
@@ -58,7 +58,7 @@ func TestGetScriptPaths(t *testing.T) {
 	assert.NoError(t, err)
 	require.NotNil(t, roleManifest)
 
-	fullScripts := roleManifest.Roles[0].GetScriptPaths()
+	fullScripts := roleManifest.InstanceGroups[0].GetScriptPaths()
 	assert.Len(t, fullScripts, 3)
 	for _, leafName := range []string{"environ.sh", "myrole.sh", "post_config_script.sh"} {
 		assert.Equal(t, filepath.Join(workDir, "../test-assets/role-manifests/model", leafName), fullScripts[leafName])
@@ -118,13 +118,13 @@ func TestLoadRoleManifestMultipleReleasesOK(t *testing.T) {
 	require.NotNil(t, roleManifest)
 
 	assert.Equal(t, roleManifestPath, roleManifest.manifestFilePath)
-	assert.Len(t, roleManifest.Roles, 2)
+	assert.Len(t, roleManifest.InstanceGroups, 2)
 
-	myrole := roleManifest.Roles[0]
+	myrole := roleManifest.InstanceGroups[0]
 	assert.Len(t, myrole.Scripts, 1)
 	assert.Equal(t, "myrole.sh", myrole.Scripts[0])
 
-	foorole := roleManifest.Roles[1]
+	foorole := roleManifest.InstanceGroups[1]
 	torjob := foorole.RoleJobs[0]
 	assert.Equal(t, "tor", torjob.Name)
 	if assert.NotNil(t, torjob.Release) {
@@ -187,12 +187,12 @@ func TestRoleManifestTagList(t *testing.T) {
 					err := yaml.Unmarshal(manifestContents, roleManifest)
 					require.NoError(t, err, "Error unmarshalling role manifest")
 					roleManifest.Configuration = &Configuration{Templates: map[string]string{}}
-					require.NotEmpty(t, roleManifest.Roles, "No roles loaded")
-					roleManifest.Roles[0].Type = roleType
-					roleManifest.Roles[0].Tags = []RoleTag{RoleTag(tag)}
+					require.NotEmpty(t, roleManifest.InstanceGroups, "No roles loaded")
+					roleManifest.InstanceGroups[0].Type = roleType
+					roleManifest.InstanceGroups[0].Tags = []RoleTag{RoleTag(tag)}
 					if RoleTag(tag) == RoleTagActivePassive {
 						// An active/passive probe is required when tagged as active/passive
-						roleManifest.Roles[0].Run.ActivePassiveProbe = "hello"
+						roleManifest.InstanceGroups[0].Run.ActivePassiveProbe = "hello"
 					}
 					err = roleManifest.resolveRoleManifest([]*Release{release}, nil)
 					acceptable := false
@@ -239,13 +239,13 @@ func TestNonBoshRolesAreIgnoredOK(t *testing.T) {
 	require.NotNil(t, roleManifest)
 
 	assert.Equal(t, roleManifestPath, roleManifest.manifestFilePath)
-	assert.Len(t, roleManifest.Roles, 2)
+	assert.Len(t, roleManifest.InstanceGroups, 2)
 }
 
 func TestRolesSort(t *testing.T) {
 	assert := assert.New(t)
 
-	roles := Roles{
+	roles := InstanceGroups{
 		{Name: "aaa"},
 		{Name: "bbb"},
 	}
@@ -253,7 +253,7 @@ func TestRolesSort(t *testing.T) {
 	assert.Equal(roles[0].Name, "aaa")
 	assert.Equal(roles[1].Name, "bbb")
 
-	roles = Roles{
+	roles = InstanceGroups{
 		{Name: "ddd"},
 		{Name: "ccc"},
 	}
@@ -265,7 +265,7 @@ func TestRolesSort(t *testing.T) {
 func TestGetScriptSignatures(t *testing.T) {
 	assert := assert.New(t)
 
-	refRole := &Role{
+	refRole := &InstanceGroup{
 		Name: "bbb",
 		RoleJobs: []*RoleJob{
 			{
@@ -300,7 +300,7 @@ func TestGetScriptSignatures(t *testing.T) {
 	err = ioutil.WriteFile(scriptPath, []byte("true\n"), 0644)
 	assert.NoError(err)
 
-	differentPatch := &Role{
+	differentPatch := &InstanceGroup{
 		Name:     refRole.Name,
 		RoleJobs: []*RoleJob{refRole.RoleJobs[0], refRole.RoleJobs[1]},
 		Scripts:  []string{scriptName},
@@ -322,7 +322,7 @@ func TestGetScriptSignatures(t *testing.T) {
 func TestGetTemplateSignatures(t *testing.T) {
 	assert := assert.New(t)
 
-	differentTemplate1 := &Role{
+	differentTemplate1 := &InstanceGroup{
 		Name:     "aaa",
 		RoleJobs: []*RoleJob{},
 		Configuration: &Configuration{
@@ -330,7 +330,7 @@ func TestGetTemplateSignatures(t *testing.T) {
 		},
 	}
 
-	differentTemplate2 := &Role{
+	differentTemplate2 := &InstanceGroup{
 		Name:     "aaa",
 		RoleJobs: []*RoleJob{},
 		Configuration: &Configuration{
@@ -713,11 +713,11 @@ func TestLoadRoleManifestHealthChecks(t *testing.T) {
 				err := yaml.Unmarshal(manifestContents, roleManifest)
 				require.NoError(t, err, "Error unmarshalling role manifest")
 				roleManifest.Configuration = &Configuration{Templates: map[string]string{}}
-				require.NotEmpty(t, roleManifest.Roles, "No roles loaded")
+				require.NotEmpty(t, roleManifest.InstanceGroups, "No roles loaded")
 				if sample.roleType != RoleType("") {
-					roleManifest.Roles[0].Type = sample.roleType
+					roleManifest.InstanceGroups[0].Type = sample.roleType
 				}
-				roleManifest.Roles[0].Run = &RoleRun{
+				roleManifest.InstanceGroups[0].Run = &RoleRun{
 					HealthCheck: &sample.healthCheck,
 				}
 				err = roleManifest.resolveRoleManifest([]*Release{release}, nil)
@@ -736,11 +736,11 @@ func TestLoadRoleManifestHealthChecks(t *testing.T) {
 		err := yaml.Unmarshal(manifestContents, roleManifest)
 		require.NoError(t, err, "Error unmarshalling role manifest")
 		roleManifest.Configuration = &Configuration{Templates: map[string]string{}}
-		require.NotEmpty(t, roleManifest.Roles, "No roles loaded")
+		require.NotEmpty(t, roleManifest.InstanceGroups, "No roles loaded")
 
-		roleManifest.Roles[0].Type = RoleTypeBosh
-		roleManifest.Roles[0].Tags = []RoleTag{}
-		roleManifest.Roles[0].Run = &RoleRun{
+		roleManifest.InstanceGroups[0].Type = RoleTypeBosh
+		roleManifest.InstanceGroups[0].Tags = []RoleTag{}
+		roleManifest.InstanceGroups[0].Run = &RoleRun{
 			ActivePassiveProbe: "/bin/true",
 		}
 		err = roleManifest.resolveRoleManifest([]*Release{release}, nil)
@@ -754,11 +754,11 @@ func TestLoadRoleManifestHealthChecks(t *testing.T) {
 		err := yaml.Unmarshal(manifestContents, roleManifest)
 		require.NoError(t, err, "Error unmarshalling role manifest")
 		roleManifest.Configuration = &Configuration{Templates: map[string]string{}}
-		require.NotEmpty(t, roleManifest.Roles, "No roles loaded")
+		require.NotEmpty(t, roleManifest.InstanceGroups, "No roles loaded")
 
-		roleManifest.Roles[0].Type = RoleTypeBosh
-		roleManifest.Roles[0].Tags = []RoleTag{RoleTagActivePassive}
-		roleManifest.Roles[0].Run = &RoleRun{}
+		roleManifest.InstanceGroups[0].Type = RoleTypeBosh
+		roleManifest.InstanceGroups[0].Tags = []RoleTag{RoleTagActivePassive}
+		roleManifest.InstanceGroups[0].Run = &RoleRun{}
 		err = roleManifest.resolveRoleManifest([]*Release{release}, nil)
 		assert.EqualError(t, err,
 			`roles[myrole].run.active-passive-probe: Required value: active-passive roles must specify the correct probe`)
@@ -770,11 +770,11 @@ func TestLoadRoleManifestHealthChecks(t *testing.T) {
 		err := yaml.Unmarshal(manifestContents, roleManifest)
 		require.NoError(t, err, "Error unmarshalling role manifest")
 		roleManifest.Configuration = &Configuration{Templates: map[string]string{}}
-		require.NotEmpty(t, roleManifest.Roles, "No roles loaded")
+		require.NotEmpty(t, roleManifest.InstanceGroups, "No roles loaded")
 
-		roleManifest.Roles[0].Type = RoleTypeBoshTask
-		roleManifest.Roles[0].Tags = []RoleTag{RoleTagActivePassive}
-		roleManifest.Roles[0].Run = &RoleRun{ActivePassiveProbe: "/bin/false"}
+		roleManifest.InstanceGroups[0].Type = RoleTypeBoshTask
+		roleManifest.InstanceGroups[0].Tags = []RoleTag{RoleTagActivePassive}
+		roleManifest.InstanceGroups[0].Run = &RoleRun{ActivePassiveProbe: "/bin/false"}
 		err = roleManifest.resolveRoleManifest([]*Release{release}, nil)
 		assert.EqualError(t, err,
 			`roles[myrole].tags[0]: Invalid value: "active-passive": active-passive tag is only supported in [bosh] roles, not bosh-task`)
@@ -786,11 +786,11 @@ func TestLoadRoleManifestHealthChecks(t *testing.T) {
 		err := yaml.Unmarshal(manifestContents, roleManifest)
 		require.NoError(t, err, "Error unmarshalling role manifest")
 		roleManifest.Configuration = &Configuration{Templates: map[string]string{}}
-		require.NotEmpty(t, roleManifest.Roles, "No roles loaded")
+		require.NotEmpty(t, roleManifest.InstanceGroups, "No roles loaded")
 
-		roleManifest.Roles[0].Type = RoleTypeBosh
-		roleManifest.Roles[0].Tags = []RoleTag{RoleTagHeadless, RoleTagActivePassive}
-		roleManifest.Roles[0].Run = &RoleRun{ActivePassiveProbe: "/bin/false"}
+		roleManifest.InstanceGroups[0].Type = RoleTypeBosh
+		roleManifest.InstanceGroups[0].Tags = []RoleTag{RoleTagHeadless, RoleTagActivePassive}
+		roleManifest.InstanceGroups[0].Run = &RoleRun{ActivePassiveProbe: "/bin/false"}
 		err = roleManifest.resolveRoleManifest([]*Release{release}, nil)
 		assert.EqualError(t, err,
 			`roles[myrole].tags[1]: Invalid value: "active-passive": headless roles may not be active-passive`)
@@ -959,8 +959,8 @@ func TestRoleResolveLinksMultipleProvider(t *testing.T) {
 	}
 
 	roleManifest := &RoleManifest{
-		Roles: Roles{
-			&Role{
+		InstanceGroups: InstanceGroups{
+			&InstanceGroup{
 				Name: "role-1",
 				RoleJobs: []*RoleJob{
 					{
@@ -974,7 +974,7 @@ func TestRoleResolveLinksMultipleProvider(t *testing.T) {
 					{Job: job2},
 				},
 			},
-			&Role{
+			&InstanceGroup{
 				Name: "role-2",
 				RoleJobs: []*RoleJob{
 					{Job: job2},
@@ -992,14 +992,14 @@ func TestRoleResolveLinksMultipleProvider(t *testing.T) {
 					},
 				},
 			},
-			&Role{
+			&InstanceGroup{
 				Name: "role-3",
 				// This does _not_ have an explicitly exported provider
 				RoleJobs: []*RoleJob{{Job: job2}, {Job: job3}},
 			},
 		},
 	}
-	for _, r := range roleManifest.Roles {
+	for _, r := range roleManifest.InstanceGroups {
 		for _, roleJob := range r.RoleJobs {
 			roleJob.Name = roleJob.Job.Name
 			if roleJob.ResolvedConsumers == nil {
@@ -1083,7 +1083,7 @@ func TestWriteConfigs(t *testing.T) {
 		},
 	}
 
-	role := &Role{
+	role := &InstanceGroup{
 		Name: "dummy role",
 		RoleJobs: []*RoleJob{
 			{
@@ -1163,7 +1163,7 @@ func TestLoadRoleManifestColocatedContainers(t *testing.T) {
 	assert.NoError(err)
 	assert.NotNil(roleManifest)
 
-	assert.Len(roleManifest.Roles, 2)
+	assert.Len(roleManifest.InstanceGroups, 2)
 	assert.EqualValues(RoleTypeBosh, roleManifest.LookupRole("main-role").Type)
 	assert.EqualValues(RoleTypeColocatedContainer, roleManifest.LookupRole("to-be-colocated").Type)
 	assert.Len(roleManifest.LookupRole("main-role").ColocatedContainers, 1)

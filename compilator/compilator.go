@@ -169,7 +169,7 @@ type compileResult struct {
 // - synchronizer will greedily drain the <-todoCh to starve the
 //   workers out and won't wait for the <-doneCh for the N packages it
 //   drained.
-func (c *Compilator) Compile(workerCount int, releases []*model.Release, roles model.Roles, verbose bool) error {
+func (c *Compilator) Compile(workerCount int, releases []*model.Release, roles model.InstanceGroups, verbose bool) error {
 	packages, err := c.removeCompiledPackages(c.gatherPackages(releases, roles), verbose)
 
 	if err != nil {
@@ -245,7 +245,7 @@ func (c *Compilator) Compile(workerCount int, releases []*model.Release, roles m
 	return err
 }
 
-func (c *Compilator) gatherPackages(releases []*model.Release, roles model.Roles) model.Packages {
+func (c *Compilator) gatherPackages(releases []*model.Release, roles model.InstanceGroups) model.Packages {
 	var packages []*model.Package
 
 	for _, release := range releases {
@@ -735,7 +735,7 @@ func (c *Compilator) removeCompiledPackages(packages model.Packages, verbose boo
 
 // gatherPackagesFromRoles gathers the list of packages of the release, from a list of roles, as well as all needed dependencies
 // This happens to be a subset of release.Packages, which helps avoid compiling unneeded packages
-func (c *Compilator) gatherPackagesFromRoles(release *model.Release, roles model.Roles) []*model.Package {
+func (c *Compilator) gatherPackagesFromRoles(release *model.Release, roles model.InstanceGroups) []*model.Package {
 	var resultPackages []*model.Package
 	listedPackages := make(map[string]bool)
 	pendingPackages := list.New()

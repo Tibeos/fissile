@@ -176,7 +176,7 @@ func (p *PackagesImageBuilder) determinePackagesLayerBaseImage(packages model.Pa
 }
 
 // NewDockerPopulator returns a function which can populate a tar stream with the docker context to build the packages layer image with
-func (p *PackagesImageBuilder) NewDockerPopulator(roles model.Roles, labels map[string]string, forceBuildAll bool) func(*tar.Writer) error {
+func (p *PackagesImageBuilder) NewDockerPopulator(roles model.InstanceGroups, labels map[string]string, forceBuildAll bool) func(*tar.Writer) error {
 	return func(tarWriter *tar.Writer) error {
 		var err error
 		if len(roles) == 0 {
@@ -267,7 +267,7 @@ func (p *PackagesImageBuilder) generateDockerfile(baseImage string, packages mod
 }
 
 // GetPackagesLayerImageName generates a docker image name for the amalgamation holding all packages used in the specified roles
-func (p *PackagesImageBuilder) GetPackagesLayerImageName(roleManifest *model.RoleManifest, roles model.Roles, grapher util.ModelGrapher) (string, error) {
+func (p *PackagesImageBuilder) GetPackagesLayerImageName(roleManifest *model.RoleManifest, roles model.InstanceGroups, grapher util.ModelGrapher) (string, error) {
 	// Get the list of packages; use the fingerprint to ensure we have no repeats
 	pkgMap := make(map[string]*model.Package)
 	for _, r := range roles {

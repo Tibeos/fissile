@@ -9,7 +9,7 @@ import (
 )
 
 // NewJob creates a new Job for the given role, as well as any objects it depends on
-func NewJob(role *model.Role, settings ExportSettings, grapher util.ModelGrapher) (helm.Node, error) {
+func NewJob(role *model.InstanceGroup, settings ExportSettings, grapher util.ModelGrapher) (helm.Node, error) {
 	podTemplate, err := NewPodTemplate(role, settings, grapher)
 	if err != nil {
 		return nil, err

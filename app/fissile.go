@@ -420,7 +420,7 @@ func (f *Fissile) CleanCache(targetPath string) error {
 
 // GeneratePackagesRoleImage builds the docker image for the packages layer
 // where all packages are included
-func (f *Fissile) GeneratePackagesRoleImage(stemcellImageName string, roleManifest *model.RoleManifest, noBuild, force bool, roles model.Roles, packagesImageBuilder *builder.PackagesImageBuilder, labels map[string]string) error {
+func (f *Fissile) GeneratePackagesRoleImage(stemcellImageName string, roleManifest *model.RoleManifest, noBuild, force bool, roles model.InstanceGroups, packagesImageBuilder *builder.PackagesImageBuilder, labels map[string]string) error {
 	if len(f.releases) == 0 {
 		return fmt.Errorf("Releases not loaded")
 	}
@@ -473,7 +473,7 @@ func (f *Fissile) GeneratePackagesRoleImage(stemcellImageName string, roleManife
 
 // GeneratePackagesRoleTarball builds a tarball snapshot of the build context
 // for the docker image for the packages layer where all packages are included
-func (f *Fissile) GeneratePackagesRoleTarball(repository string, roleManifest *model.RoleManifest, noBuild, force bool, roles model.Roles, outputDirectory string, packagesImageBuilder *builder.PackagesImageBuilder, labels map[string]string) error {
+func (f *Fissile) GeneratePackagesRoleTarball(repository string, roleManifest *model.RoleManifest, noBuild, force bool, roles model.InstanceGroups, outputDirectory string, packagesImageBuilder *builder.PackagesImageBuilder, labels map[string]string) error {
 	if len(f.releases) == 0 {
 		return fmt.Errorf("Releases not loaded")
 	}
@@ -638,7 +638,7 @@ func (f *Fissile) ListRoleImages(registry, organization, repository, roleManifes
 		return fmt.Errorf("Error loading opinions: %s", err.Error())
 	}
 
-	for _, role := range roleManifest.Roles {
+	for _, role := range roleManifest.InstanceGroups {
 		devVersion, err := role.GetRoleDevVersion(opinions, tagExtra, f.Version, f)
 		if err != nil {
 			return fmt.Errorf("Error creating role checksum: %s", err.Error())
@@ -1033,7 +1033,7 @@ func (f *Fissile) writeHelmNode(dirName, fileName string, node helm.Node) error 
 	return err
 }
 
-func (f *Fissile) generateBoshTaskRole(outputFile *os.File, role *model.Role, settings kube.ExportSettings) error {
+func (f *Fissile) generateBoshTaskRole(outputFile *os.File, role *model.InstanceGroup, settings kube.ExportSettings) error {
 	if role.HasTag(model.RoleTagStopOnFailure) {
 		pod, err := kube.NewPod(role, settings, f)
 		if err != nil {
@@ -1059,7 +1059,7 @@ func (f *Fissile) generateBoshTaskRole(outputFile *os.File, role *model.Role, se
 
 // roleHasStorage returns true if a given role uses shared or
 // persistent volumes.
-func (f *Fissile) roleHasStorage(role *model.Role) bool {
+func (f *Fissile) roleHasStorage(role *model.InstanceGroup) bool {
 	for _, volume := range role.Run.Volumes {
 		switch volume.Type {
 		case model.VolumeTypePersistent, model.VolumeTypeShared:
@@ -1070,7 +1070,7 @@ func (f *Fissile) roleHasStorage(role *model.Role) bool {
 }
 
 func (f *Fissile) generateKubeRoles(settings kube.ExportSettings) error {
-	for _, role := range settings.RoleManifest.Roles {
+	for _, role := range settings.RoleManifest.InstanceGroups {
 		if role.IsColocatedContainerRole() {
 			continue
 		}

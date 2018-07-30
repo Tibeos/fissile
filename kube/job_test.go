@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func jobTestLoadRole(assert *assert.Assertions, roleName, manifestName string) *model.Role {
+func jobTestLoadRole(assert *assert.Assertions, roleName, manifestName string) *model.InstanceGroup {
 	workDir, err := os.Getwd()
 	assert.NoError(err)
 

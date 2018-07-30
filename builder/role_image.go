@@ -75,7 +75,7 @@ func NewRoleImageBuilder(repository, compiledPackagesPath, targetPath, lightOpin
 }
 
 // NewDockerPopulator returns a function which can populate a tar stream with the docker context to build the packages layer image with
-func (r *RoleImageBuilder) NewDockerPopulator(role *model.Role, baseImageName string) func(*tar.Writer) error {
+func (r *RoleImageBuilder) NewDockerPopulator(role *model.InstanceGroup, baseImageName string) func(*tar.Writer) error {
 	return func(tarWriter *tar.Writer) error {
 		if len(role.RoleJobs) == 0 {
 			return fmt.Errorf("Error - role %s has 0 jobs", role.Name)
@@ -258,7 +258,7 @@ func (r *RoleImageBuilder) NewDockerPopulator(role *model.Role, baseImageName st
 	}
 }
 
-func (r *RoleImageBuilder) generateRunScript(role *model.Role, assetName string) ([]byte, error) {
+func (r *RoleImageBuilder) generateRunScript(role *model.InstanceGroup, assetName string) ([]byte, error) {
 	asset, err := dockerfiles.Asset(assetName)
 	if err != nil {
 		return nil, err
@@ -290,7 +290,7 @@ func (r *RoleImageBuilder) generateRunScript(role *model.Role, assetName string)
 	return output.Bytes(), nil
 }
 
-func (r *RoleImageBuilder) generateJobsConfig(role *model.Role) ([]byte, error) {
+func (r *RoleImageBuilder) generateJobsConfig(role *model.InstanceGroup) ([]byte, error) {
 	jobsConfig := make(map[string]map[string]interface{})
 
 	for index, roleJob := range role.RoleJobs {
@@ -329,7 +329,7 @@ func (r *RoleImageBuilder) generateJobsConfig(role *model.Role) ([]byte, error) 
 }
 
 // generateDockerfile builds a docker file for a given role.
-func (r *RoleImageBuilder) generateDockerfile(role *model.Role, baseImageName string, outputFile io.Writer) error {
+func (r *RoleImageBuilder) generateDockerfile(role *model.InstanceGroup, baseImageName string, outputFile io.Writer) error {
 	asset, err := dockerfiles.Asset("Dockerfile-role")
 	if err != nil {
 		return err
@@ -352,7 +352,7 @@ func (r *RoleImageBuilder) generateDockerfile(role *model.Role, baseImageName st
 }
 
 type roleBuildJob struct {
-	role            *model.Role
+	role            *model.InstanceGroup
 	builder         *RoleImageBuilder
 	ui              *termui.UI
 	grapher         util.ModelGrapher
@@ -478,7 +478,7 @@ func (j roleBuildJob) Run() {
 }
 
 // BuildRoleImages triggers the building of the role docker images in parallel
-func (r *RoleImageBuilder) BuildRoleImages(roles model.Roles, registry, organization, repository, baseImageName, outputDirectory string, force, noBuild bool, workerCount int) error {
+func (r *RoleImageBuilder) BuildRoleImages(roles model.InstanceGroups, registry, organization, repository, baseImageName, outputDirectory string, force, noBuild bool, workerCount int) error {
 	if workerCount < 1 {
 		return fmt.Errorf("Invalid worker count %d", workerCount)
 	}
@@ -536,7 +536,7 @@ func (r *RoleImageBuilder) BuildRoleImages(roles model.Roles, registry, organiza
 }
 
 // GetRoleDevImageName generates a docker image name to be used as a dev role image
-func GetRoleDevImageName(registry, organization, repository string, role *model.Role, version string) string {
+func GetRoleDevImageName(registry, organization, repository string, role *model.InstanceGroup, version string) string {
 	var imageName string
 	if registry != "" {
 		imageName = registry + "/"

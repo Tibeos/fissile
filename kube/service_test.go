@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func serviceTestLoadRole(assert *assert.Assertions, manifestName string) (*model.RoleManifest, *model.Role) {
+func serviceTestLoadRole(assert *assert.Assertions, manifestName string) (*model.RoleManifest, *model.InstanceGroup) {
 	workDir, err := os.Getwd()
 	assert.NoError(err)
 

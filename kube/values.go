@@ -77,7 +77,7 @@ func MakeValues(settings ExportSettings) (helm.Node, error) {
 		Due to limitations on the allowable names, any dashes ("-") in the role
 		names are replaced with underscores ("_").
 	`), " ")))
-	for _, role := range settings.RoleManifest.Roles {
+	for _, role := range settings.RoleManifest.InstanceGroups {
 		if role.Run.FlightStage == model.FlightStageManual {
 			continue
 		}

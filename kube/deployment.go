@@ -10,7 +10,7 @@ import (
 )
 
 // NewDeployment creates a Deployment for the given role, and its attached services
-func NewDeployment(role *model.Role, settings ExportSettings, grapher util.ModelGrapher) (helm.Node, helm.Node, error) {
+func NewDeployment(role *model.InstanceGroup, settings ExportSettings, grapher util.ModelGrapher) (helm.Node, helm.Node, error) {
 	podTemplate, err := NewPodTemplate(role, settings, grapher)
 	if err != nil {
 		return nil, nil, err
@@ -35,7 +35,7 @@ func NewDeployment(role *model.Role, settings ExportSettings, grapher util.Model
 }
 
 // getAffinityBlock returns an affinity block to add to a podspec
-func getAffinityBlock(role *model.Role) *helm.Mapping {
+func getAffinityBlock(role *model.InstanceGroup) *helm.Mapping {
 	affinity := helm.NewMapping()
 
 	if role.Run.Affinity.PodAntiAffinity != nil {
@@ -53,7 +53,7 @@ func getAffinityBlock(role *model.Role) *helm.Mapping {
 }
 
 // addAffinityRules adds affinity rules to the pod spec
-func addAffinityRules(role *model.Role, spec *helm.Mapping, settings ExportSettings) error {
+func addAffinityRules(role *model.InstanceGroup, spec *helm.Mapping, settings ExportSettings) error {
 	if role.Run.Affinity != nil {
 		if role.Run.Affinity.NodeAffinity != nil {
 			return errors.New("node affinity in role manifest not allowed")
@@ -86,7 +86,7 @@ func addAffinityRules(role *model.Role, spec *helm.Mapping, settings ExportSetti
 // generalCheck adds common guards to the pod described by the
 // controller. This only applies to helm charts, not basic kube
 // definitions.
-func generalCheck(role *model.Role, controller *helm.Mapping, settings ExportSettings) error {
+func generalCheck(role *model.InstanceGroup, controller *helm.Mapping, settings ExportSettings) error {
 	if !settings.CreateHelmChart {
 		return nil
 	}
@@ -134,7 +134,7 @@ func generalCheck(role *model.Role, controller *helm.Mapping, settings ExportSet
 // replicaCheck adds various guards to validate the number of replicas
 // for the pod described by the controller. It further adds the
 // replicas specification itself as well.
-func replicaCheck(role *model.Role, controller *helm.Mapping, service helm.Node, settings ExportSettings) error {
+func replicaCheck(role *model.InstanceGroup, controller *helm.Mapping, service helm.Node, settings ExportSettings) error {
 	spec := controller.Get("spec").(*helm.Mapping)
 
 	err := addAffinityRules(role, spec, settings)

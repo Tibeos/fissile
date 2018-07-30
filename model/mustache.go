@@ -26,7 +26,7 @@ func MakeMapOfVariables(roleManifest *RoleManifest) CVMap {
 
 // GetVariablesForRole returns all the environment variables required for
 // calculating all the templates for the role
-func (r *Role) GetVariablesForRole() (ConfigurationVariableSlice, error) {
+func (r *InstanceGroup) GetVariablesForRole() (ConfigurationVariableSlice, error) {
 
 	configsDictionary := MakeMapOfVariables(r.roleManifest)
 

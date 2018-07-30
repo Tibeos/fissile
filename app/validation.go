@@ -129,7 +129,7 @@ func collectManifestProperties(roleManifest *model.RoleManifest) map[string]stri
 	properties := make(map[string]string)
 
 	// Per-role properties
-	for _, role := range roleManifest.Roles {
+	for _, role := range roleManifest.InstanceGroups {
 		for property, template := range role.Configuration.Templates {
 			properties[property] = template
 		}
@@ -190,7 +190,7 @@ func checkForDuplicatesBetweenManifestAndLight(light map[string]string, roleMani
 	}
 
 	// ... then the per-role properties
-	for _, role := range roleManifest.Roles {
+	for _, role := range roleManifest.InstanceGroups {
 		prefix := fmt.Sprintf("roles[%s].configuration.templates", role.Name)
 
 		for property, template := range role.Configuration.Templates {
