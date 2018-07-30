@@ -1,5 +1,5 @@
 ---
-roles:
+instance_groups:
 - name: role
   type: bosh-task
   jobs:

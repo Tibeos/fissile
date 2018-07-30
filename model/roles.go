@@ -56,7 +56,7 @@ const (
 
 // RoleManifest represents a collection of roles
 type RoleManifest struct {
-	Roles         Roles          `yaml:"roles"`
+	Roles         Roles          `yaml:"instance_groups"`
 	Configuration *Configuration `yaml:"configuration"`
 
 	manifestFilePath string
