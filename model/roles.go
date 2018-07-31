@@ -330,19 +330,19 @@ type ConfigurationVariableGenerator struct {
 	ValueType string        `yaml:"value_type"`
 }
 
-// Len is the number of roles in the slice
-func (roles InstanceGroups) Len() int {
-	return len(roles)
+// Len is the number of instance groups in the slice
+func (igs InstanceGroups) Len() int {
+	return len(igs)
 }
 
 // Less reports whether role at index i sort before role at index j
-func (roles InstanceGroups) Less(i, j int) bool {
-	return strings.Compare(roles[i].Name, roles[j].Name) < 0
+func (igs InstanceGroups) Less(i, j int) bool {
+	return strings.Compare(igs[i].Name, igs[j].Name) < 0
 }
 
 // Swap exchanges roles at index i and index j
-func (roles InstanceGroups) Swap(i, j int) {
-	roles[i], roles[j] = roles[j], roles[i]
+func (igs InstanceGroups) Swap(i, j int) {
+	igs[i], igs[j] = igs[j], igs[i]
 }
 
 // LoadRoleManifest loads a yaml manifest that details how jobs get grouped into roles
@@ -642,8 +642,8 @@ func (m *RoleManifest) resolveLinks() validation.ErrorList {
 	return errors
 }
 
-// SelectRoles will find only the given roles in the role manifest
-func (m *RoleManifest) SelectRoles(roleNames []string) (InstanceGroups, error) {
+// SelectInstanceGroups will find only the given roles in the role manifest
+func (m *RoleManifest) SelectInstanceGroups(roleNames []string) (InstanceGroups, error) {
 	if len(roleNames) == 0 {
 		// No role names specified, assume all roles
 		return m.InstanceGroups, nil

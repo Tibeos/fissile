@@ -352,8 +352,8 @@ func TestGenerateRoleImageDockerfileDir(t *testing.T) {
 }
 
 // getPackage is a helper to get a package from a list of roles
-func getPackage(roles model.InstanceGroups, role, job, pkg string) *model.Package {
-	for _, r := range roles {
+func getPackage(instanceGroups model.InstanceGroups, role, job, pkg string) *model.Package {
+	for _, r := range instanceGroups {
 		if r.Name != role {
 			continue
 		}
@@ -609,9 +609,9 @@ func TestBuildRoleImages(t *testing.T) {
 func TestGetRoleDevImageName(t *testing.T) {
 	assert := assert.New(t)
 
-	var role model.InstanceGroup
+	var instanceGroup model.InstanceGroup
 
-	role.Name = "foorole"
+	instanceGroup.Name = "foorole"
 
 	reg := "test-registry:9000"
 	org := "test-org"
@@ -620,21 +620,21 @@ func TestGetRoleDevImageName(t *testing.T) {
 
 	// Test with repository only
 	expected := "test-repository-foorole:a886ed76c6d6e5a96ad5c37fb208368a430a29d770f1d149a78e1e6e8091eb12"
-	imageName := GetRoleDevImageName("", "", repo, &role, version)
+	imageName := GetRoleDevImageName("", "", repo, &instanceGroup, version)
 	assert.Equal(expected, imageName)
 
 	// Test with org and repository
 	expected = "test-org/test-repository-foorole:a886ed76c6d6e5a96ad5c37fb208368a430a29d770f1d149a78e1e6e8091eb12"
-	imageName = GetRoleDevImageName("", org, repo, &role, version)
+	imageName = GetRoleDevImageName("", org, repo, &instanceGroup, version)
 	assert.Equal(expected, imageName)
 
 	// Test with registry and repository
 	expected = "test-registry:9000/test-repository-foorole:a886ed76c6d6e5a96ad5c37fb208368a430a29d770f1d149a78e1e6e8091eb12"
-	imageName = GetRoleDevImageName(reg, "", repo, &role, version)
+	imageName = GetRoleDevImageName(reg, "", repo, &instanceGroup, version)
 	assert.Equal(expected, imageName)
 
 	// Test with all three
 	expected = "test-registry:9000/test-org/test-repository-foorole:a886ed76c6d6e5a96ad5c37fb208368a430a29d770f1d149a78e1e6e8091eb12"
-	imageName = GetRoleDevImageName(reg, org, repo, &role, version)
+	imageName = GetRoleDevImageName(reg, org, repo, &instanceGroup, version)
 	assert.Equal(expected, imageName)
 }

@@ -34,8 +34,8 @@ func podTemplateTestLoadRole(assert *assert.Assertions) *model.InstanceGroup {
 	if !assert.NoError(err) {
 		return nil
 	}
-	role := manifest.LookupRole("myrole")
-	if !assert.NotNil(role, "Failed to find role in manifest") {
+	instanceGroup := manifest.LookupRole("myrole")
+	if !assert.NotNil(instanceGroup, "Failed to find role in manifest") {
 		return nil
 	}
 
@@ -48,7 +48,7 @@ func podTemplateTestLoadRole(assert *assert.Assertions) *model.InstanceGroup {
 				Secret:   true,
 				Internal: true,
 			})
-	return role
+	return instanceGroup
 }
 
 type Sample struct {

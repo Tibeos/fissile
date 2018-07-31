@@ -583,7 +583,7 @@ func TestFissileSelectRolesToBuild(t *testing.T) {
 
 	for _, sample := range testSamples {
 		t.Run(strings.Join(sample.roleNames, ","), func(t *testing.T) {
-			results, err := roleManifest.SelectRoles(sample.roleNames)
+			results, err := roleManifest.SelectInstanceGroups(sample.roleNames)
 			if sample.err != "" {
 				assert.EqualError(t, err, sample.err, "while testing %v", sample.roleNames)
 			} else {
